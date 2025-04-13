@@ -12,15 +12,15 @@ public interface UserService {
 
     void save(User user);
 
-    void delete(Integer id);
+    void delete(Long id);
 
-    User getOne(Integer id);
+    User getOne(Long id);
 
-    void update(Integer id, User user);
+    void update(Long id, User user);
 
     User oneUser();
 
     User createUser(User user, Set<Role> roles);
 
-    User updateUser(User user, Set<Role> roles, Integer id);
+    User updateUser(User user, Set<Role> roles, Long id);
 }

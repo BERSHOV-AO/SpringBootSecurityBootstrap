@@ -5,10 +5,9 @@ import org.springframework.stereotype.Repository;
 import ru.kata.springbootsecuritybootstrap.models.Role;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role, Integer> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
 
     List<Role> findByName(String name);
 }

@@ -13,7 +13,6 @@ import ru.kata.springbootsecuritybootstrap.dao.UserRepository;
 import ru.kata.springbootsecuritybootstrap.models.Role;
 import ru.kata.springbootsecuritybootstrap.models.User;
 
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -58,22 +57,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Long id) {
         userRepository.deleteById(id);
     }
 
     @Override
-    public User getOne(Integer id) {
+    public User getOne(Long id) {
         return userRepository.findById(id).get();
     }
 
+    public Role getRole(String role) {
+        return roleService.findByName(role);
+    }
+
     @Override
-    public void update(Integer id, User user) {
+    public void update(Long id, User user) {
         User oldUser = userRepository.findById(id).get();
         oldUser.setUsername(user.getUsername());
         oldUser.setLastName(user.getLastName());
-        oldUser.setEmail(user.getEmail());
-        oldUser.setPassword(user.getEmail());
+        oldUser.setPassword(user.getPassword());
+        oldUser.setRoles(user.getRoles());
         userRepository.save(oldUser);
     }
 
@@ -82,7 +85,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (User) authentication.getPrincipal();
     }
-
     @Override
     public User createUser(User user, Set<Role> roles) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -97,9 +99,32 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return user;
     }
 
-
     @Override
-    public User updateUser(User user, Set<Role> roles, Integer id) {
-        return null;
+    public User updateUser(User user, Set<Role> roles, Long id) {
+        User oldUser = getOne(id);
+        String oldPassword = oldUser.getPassword();
+        String newPassword = user.getPassword();
+
+        if (newPassword != null && !newPassword.isEmpty() && !passwordEncoder.matches(newPassword, oldPassword)) {
+
+            user.setPassword(passwordEncoder.encode(newPassword));
+        } else {
+            user.setPassword(oldPassword);
+        }
+
+        Set<Role> roleSet = new HashSet<>();
+
+        if (roles == null || roles.isEmpty()) {
+            roleSet = oldUser.getRoles();
+        } else {
+            for (Role role : roles) {
+                Role newRole = role;
+                if (newRole != null) {
+                    roleSet.add(newRole);
+                }
+            }
+        }
+        user.setRoles(roleSet);
+        return user;
     }
 }

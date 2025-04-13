@@ -1,20 +1,16 @@
 package ru.kata.springbootsecuritybootstrap.models;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 
 @Entity
 @Table(name = "User")
@@ -22,37 +18,27 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
-    @Pattern(regexp = "^[А-ЯA-Z][а-яa-z]+$", message = "неккоректный ввод Имени")
-    @NotEmpty(message = "Имя не может быть пустым")
-    @Column(name = "first_Name")
-    private String firstName;
+    private String username;
 
-    @Pattern(regexp = "^[А-ЯA-Z][а-яa-z]+$", message = "неккоректный ввод Фамилии")
-    @NotEmpty(message = "Фамилия не может быть пустым")
-    @Column(name = "last_name")
+
     private String lastName;
 
-    @NotEmpty(message = "Email не может быть пустым")
-    @Email(message = "некорректный Email")
-    @Column(unique = true, name = "email")
+    @Column(unique = true)
     private String email;
 
 
     @NotEmpty(message = "Пароль не может быть пустым")
-    @Column(name = "password")
     private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @Fetch(FetchMode.JOIN)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles = new HashSet<>();
-
+    private Set<Role> roles;
 
     public String getAllUserRoles() {
         return roles.stream()
@@ -68,28 +54,27 @@ public class User implements UserDetails {
                 .collect(Collectors.joining(", "));
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(
-                new SimpleGrantedAuthority(
-                        this.getRoles().iterator().next().getName()));
+        return getRoles();
     }
 
     @Override
     public String getPassword() {
         return this.password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
 
     @Override
     public String getUsername() {
-        return this.firstName;
+        return this.username;
     }
+
     public void setUsername(String username) {
-        this.firstName = firstName;
+        this.username = username;
     }
 
     @Override
@@ -115,14 +100,20 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String firstName, String lastName, String email, String password, Set<Role> roles) {
-        this.firstName = firstName;
+//    public User(String username, String lastName, String email, String password, Set<Role> roles) {
+//        this.username = username;
+//        this.lastName = lastName;
+//        this.email = email;
+//        this.password = password;
+//        this.roles = roles;
+//    }
+
+    public User(String username, String lastName, String email, String password) {
+        this.username = username;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.roles = roles;
     }
-
 
     public Set<Role> getRoles() {
         return roles;
@@ -132,16 +123,8 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
     }
 
     public String getLastName() {
@@ -161,16 +144,28 @@ public class User implements UserDetails {
     }
 
 
-
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", firstName='" + firstName + '\'' +
+                ", username='" + username + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", roles=" + roles +
+                ", email='" + email + '\'' +
                 '}';
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(lastName, user.lastName) && Objects.equals(password, user.password) && Objects.equals(email, user.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, lastName, password, email);
     }
 }
