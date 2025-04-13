@@ -80,10 +80,16 @@ public class User implements UserDetails {
     public String getPassword() {
         return this.password;
     }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     @Override
     public String getUsername() {
         return this.firstName;
+    }
+    public void setUsername(String username) {
+        this.firstName = firstName;
     }
 
     @Override
@@ -116,6 +122,7 @@ public class User implements UserDetails {
         this.password = password;
         this.roles = roles;
     }
+
 
     public Set<Role> getRoles() {
         return roles;
@@ -153,9 +160,7 @@ public class User implements UserDetails {
         this.email = email;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+
 
     @Override
     public String toString() {
