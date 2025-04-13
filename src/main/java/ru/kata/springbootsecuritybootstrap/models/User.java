@@ -28,7 +28,6 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String email;
 
-
     @NotEmpty(message = "Пароль не может быть пустым")
     private String password;
 
@@ -100,14 +99,6 @@ public class User implements UserDetails {
     public User() {
     }
 
-//    public User(String username, String lastName, String email, String password, Set<Role> roles) {
-//        this.username = username;
-//        this.lastName = lastName;
-//        this.email = email;
-//        this.password = password;
-//        this.roles = roles;
-//    }
-
     public User(String username, String lastName, String email, String password) {
         this.username = username;
         this.lastName = lastName;
@@ -155,13 +146,16 @@ public class User implements UserDetails {
                 '}';
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(lastName, user.lastName) && Objects.equals(password, user.password) && Objects.equals(email, user.email);
+        return Objects.equals(id, user.id)
+                && Objects.equals(username, user.username)
+                && Objects.equals(lastName, user.lastName)
+                && Objects.equals(password, user.password)
+                && Objects.equals(email, user.email);
     }
 
     @Override
